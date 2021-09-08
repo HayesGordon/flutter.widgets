@@ -51,6 +51,7 @@ class ScrollablePositionedList extends StatefulWidget {
     this.addAutomaticKeepAlives = true,
     this.addRepaintBoundaries = true,
     this.minCacheExtent,
+    this.findChildIndexCallback,
   })  : assert(itemCount != null),
         assert(itemBuilder != null),
         itemPositionsNotifier = itemPositionsListener as ItemPositionsNotifier?,
@@ -77,11 +78,22 @@ class ScrollablePositionedList extends StatefulWidget {
     this.addAutomaticKeepAlives = true,
     this.addRepaintBoundaries = true,
     this.minCacheExtent,
+    this.findChildIndexCallback,
   })  : assert(itemCount != null),
         assert(itemBuilder != null),
         assert(separatorBuilder != null),
         itemPositionsNotifier = itemPositionsListener as ItemPositionsNotifier?,
         super(key: key);
+
+  /// Called to find the new index of a child based on its key in case of reordering.
+  ///
+  /// If not provided, a child widget may not map to its existing [RenderObject]
+  /// when the order in which children are returned from [builder] changes.
+  /// This may result in state-loss.
+  ///
+  /// This callback should take an input [Key], and it should return the
+  /// index of the child element with that associated key, or null if not found.
+  final ChildIndexGetter? findChildIndexCallback;
 
   /// Number of items the [itemBuilder] can produce.
   final int itemCount;
@@ -354,6 +366,7 @@ class _ScrollablePositionedListState extends State<ScrollablePositionedList>
                       padding: widget.padding,
                       addAutomaticKeepAlives: widget.addAutomaticKeepAlives,
                       addRepaintBoundaries: widget.addRepaintBoundaries,
+                      findChildIndexCallback: widget.findChildIndexCallback,
                     ),
                   ),
                 ),

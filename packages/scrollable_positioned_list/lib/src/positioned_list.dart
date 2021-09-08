@@ -39,12 +39,23 @@ class PositionedList extends StatefulWidget {
     this.padding,
     this.cacheExtent,
     this.semanticChildCount,
+    this.findChildIndexCallback,
     this.addSemanticIndexes = true,
     this.addRepaintBoundaries = true,
     this.addAutomaticKeepAlives = true,
   })  : assert(itemCount != null),
         assert(itemBuilder != null),
         assert((positionedIndex == 0) || (positionedIndex < itemCount));
+
+  /// Called to find the new index of a child based on its key in case of reordering.
+  ///
+  /// If not provided, a child widget may not map to its existing [RenderObject]
+  /// when the order in which children are returned from [builder] changes.
+  /// This may result in state-loss.
+  ///
+  /// This callback should take an input [Key], and it should return the
+  /// index of the child element with that associated key, or null if not found.
+  final ChildIndexGetter? findChildIndexCallback;
 
   /// Number of items the [itemBuilder] can produce.
   final int itemCount;
@@ -178,6 +189,7 @@ class _PositionedListState extends State<PositionedList> {
                         ? widget.positionedIndex
                         : 2 * widget.positionedIndex,
                     addSemanticIndexes: false,
+                    findChildIndexCallback: widget.findChildIndexCallback,
                     addRepaintBoundaries: widget.addRepaintBoundaries,
                     addAutomaticKeepAlives: widget.addAutomaticKeepAlives,
                   ),
@@ -193,6 +205,7 @@ class _PositionedListState extends State<PositionedList> {
                       : _buildSeparatedListElement(
                           index + 2 * widget.positionedIndex),
                   childCount: widget.itemCount != 0 ? 1 : 0,
+                  findChildIndexCallback: widget.findChildIndexCallback,
                   addSemanticIndexes: false,
                   addRepaintBoundaries: widget.addRepaintBoundaries,
                   addAutomaticKeepAlives: widget.addAutomaticKeepAlives,
@@ -212,6 +225,7 @@ class _PositionedListState extends State<PositionedList> {
                     childCount: widget.separatorBuilder == null
                         ? widget.itemCount - widget.positionedIndex - 1
                         : 2 * (widget.itemCount - widget.positionedIndex - 1),
+                    findChildIndexCallback: widget.findChildIndexCallback,
                     addSemanticIndexes: false,
                     addRepaintBoundaries: widget.addRepaintBoundaries,
                     addAutomaticKeepAlives: widget.addAutomaticKeepAlives,
@@ -231,12 +245,12 @@ class _PositionedListState extends State<PositionedList> {
   }
 
   Widget _buildItem(int index) {
+    final child = widget.itemBuilder(context, index);
     return RegisteredElementWidget(
-      key: ValueKey(index),
+      key: child.key,
       child: widget.addSemanticIndexes
-          ? IndexedSemantics(
-              index: index, child: widget.itemBuilder(context, index))
-          : widget.itemBuilder(context, index),
+          ? IndexedSemantics(index: index, child: child)
+          : child,
     );
   }
 
