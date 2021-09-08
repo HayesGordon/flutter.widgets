@@ -9,6 +9,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 
 import 'element_registry.dart';
+import 'indexed_key.dart';
 import 'item_positions_listener.dart';
 import 'item_positions_notifier.dart';
 import 'scroll_view.dart';
@@ -319,14 +320,14 @@ class _PositionedListState extends State<PositionedList> {
         for (var element in registeredElements.value!) {
           final RenderBox box = element.renderObject as RenderBox;
           viewport ??= RenderAbstractViewport.of(box) as RenderViewport?;
-          final ValueKey<int> key = element.widget.key as ValueKey<int>;
+          final IndexedKey key = element.widget.key as IndexedKey;
           if (widget.scrollDirection == Axis.vertical) {
             final reveal = viewport!.getOffsetToReveal(box, 0).offset;
             final itemOffset = reveal -
                 viewport.offset.pixels +
                 viewport.anchor * viewport.size.height;
             positions.add(ItemPosition(
-                index: key.value,
+                index: key.index,
                 itemLeadingEdge: itemOffset.round() /
                     scrollController.position.viewportDimension,
                 itemTrailingEdge: (itemOffset + box.size.height).round() /
@@ -335,7 +336,7 @@ class _PositionedListState extends State<PositionedList> {
             final itemOffset =
                 box.localToGlobal(Offset.zero, ancestor: viewport).dx;
             positions.add(ItemPosition(
-                index: key.value,
+                index: key.index,
                 itemLeadingEdge: (widget.reverse
                             ? scrollController.position.viewportDimension -
                                 (itemOffset + box.size.width)
