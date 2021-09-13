@@ -4,3 +4,4 @@
 
 export 'src/item_positions_listener.dart';
 export 'src/scrollable_positioned_list.dart';
+export 'src/indexed_key.dart';
