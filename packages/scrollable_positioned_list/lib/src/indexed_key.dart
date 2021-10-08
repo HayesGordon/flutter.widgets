@@ -3,13 +3,13 @@ import 'dart:ui' show hashValues;
 import 'package:flutter/foundation.dart';
 
 class IndexedKey extends LocalKey {
-  /// Creates a key that delegates its [operator==] to the given value.
+  /// Creates an indexed key that delegates its [operator==] to the given key.
   ///
   /// It contains an index used in [ScrollablePositionedList].
-  const IndexedKey(this.value, this.index);
+  const IndexedKey(this.key, this.index);
 
-  /// The value to which this key delegates its [operator==].
-  final String value;
+  /// The key to which this this delegates its [operator==].
+  final Key? key;
 
   /// Index used to show position in a list.
   final int index;
@@ -17,14 +17,14 @@ class IndexedKey extends LocalKey {
   @override
   bool operator ==(Object other) {
     if (other.runtimeType != runtimeType) return false;
-    return other is IndexedKey && other.value == value;
+    return other is IndexedKey && other.key == key;
   }
 
   @override
-  int get hashCode => hashValues(runtimeType, value);
+  int get hashCode => hashValues(runtimeType, key);
 
   @override
   String toString() {
-    return '(IndexedKey) index: $index, value: $value';
+    return '(IndexedKey) index: $index, key: $key';
   }
 }
